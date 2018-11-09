@@ -33,12 +33,21 @@ class MyFont:
             img.load()
             self.glyphs[glyph] = img.im
 
+        self.cached_bitmaps = {}
+
     def get_crop_by_character(self, character):
         return self.glyphs[character]
 
-    def getmask(self, text, mode):
+    def getsize(self, text, direction, features):
+        mask = self.getmask(text)
+        return mask.size
+
+    def getmask(self, text, mode=None):
+        if text in self.cached_bitmaps:
+            return self.cached_bitmaps[text]
         glyphs = list(map(self.get_crop_by_character, text))
         a = Image.new('1', (len(glyphs) * self.glyph_width, self.glyph_height))
         for i, glyph in enumerate(glyphs):
             a.paste(glyph, (i * self.glyph_width, 0, (i + 1) * self.glyph_width, 0 + self.glyph_height))
+        self.cached_bitmaps[text] = a.im
         return a.im

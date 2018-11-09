@@ -21,7 +21,12 @@ def handler(loop, context):
 
 fnt = MyFont('./assets/1bit.png', './assets/1bit.descriptor.json')
 ui_mgr = UI(draw_target)
-ui_mgr.push_view(TitleView(fnt=fnt, ui=ui_mgr, title='Привет, мир!'))
+ui_mgr.push_view(
+    TitleView(fnt=fnt,
+              ui=ui_mgr,
+              title='Фиштанк',
+              items=['Настройка лампы', 'Настройка фильтра', 'Информация'])
+)
 console_mgr = Console()
 loop = asyncio.get_event_loop()
 loop.set_exception_handler(handler)

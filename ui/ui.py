@@ -1,6 +1,5 @@
 import asyncio
 
-
 class UI:
     def __init__(self, canvas):
         self.view_stack = []
@@ -15,7 +14,7 @@ class UI:
         self.console_mgr = console_mgr
         while self.RUNNING:
             self.draw()
-            await asyncio.sleep(0)
+            await asyncio.sleep(0.05)
         return
 
     def push_view(self, view, callback=None):
@@ -36,4 +35,13 @@ class UI:
         return self.view_stack[-1]['view']
 
     def draw(self):
-        self.get_current_view().draw(self.canvas)
+        render = self.get_current_view().render()
+        context = {
+            'size': (128, 64)
+        }
+        try:
+            bitmap = render(context).draw()
+        except Exception as x:
+            print(x)
+        with self.canvas as image:
+            image.paste(bitmap)
