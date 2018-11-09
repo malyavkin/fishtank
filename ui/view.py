@@ -1,3 +1,8 @@
+from PIL import ImageDraw
+
+from ui.widgets.time import time_widget
+
+
 class View:
     ACTION_DOWN = 'down'
     ACTION_UP = 'up'
@@ -39,17 +44,15 @@ class TitleView(View):
         elif action == View.ACTION_UP:
             self.title = self.initial_title + 'вверх'
         elif action == View.ACTION_ENTER:
-            v = TitleView(fnt=self.fnt, UI=self.UI, title=self.initial_title+'!')
+            v = TitleView(fnt=self.fnt, UI=self.UI, title=self.initial_title + '!')
             self.push_view(v, self.onreturn)
         elif action == View.ACTION_BACK:
             try:
                 self.finish(self.title)
             except Exception as e:
                 print(e)
-            
 
     def draw(self, canvas):
-        print('TitleView draw')
         with canvas as image:
             # draw.paste(f)
             draw = ImageDraw.Draw(image)

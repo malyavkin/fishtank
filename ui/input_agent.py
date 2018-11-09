@@ -1,7 +1,8 @@
-from ui.ui import View
+from ui.view import View
 from aioconsole import ainput
 
-class console:
+
+class Console:
 
     def __init__(self):
         self.actions = {
@@ -18,10 +19,8 @@ class console:
         self.RUNNING = False
         print('Received stop signal. Send anything to exit')
 
-    async def run(self, mgr):    
+    async def run(self, mgr):
         while self.RUNNING:
             command = await ainput('(wasd/qe)>')
-            if command in self.actions.keys():            
+            if command in self.actions.keys():
                 mgr.command(self.actions[command])
-    
-        

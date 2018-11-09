@@ -27,19 +27,18 @@ class MyFont:
             left = column * self.tile_width
             up = line * self.tile_height
             right = left + self.glyph_width
-            low = up+self.glyph_height
+            low = up + self.glyph_height
 
             img = self.image.crop(box=(left, up, right, low))
             img.load()
             self.glyphs[glyph] = img.im
-
 
     def get_crop_by_character(self, character):
         return self.glyphs[character]
 
     def getmask(self, text, mode):
         glyphs = list(map(self.get_crop_by_character, text))
-        a = Image.new('1', (len(glyphs)*self.glyph_width, self.glyph_height))
+        a = Image.new('1', (len(glyphs) * self.glyph_width, self.glyph_height))
         for i, glyph in enumerate(glyphs):
-            a.paste(glyph, (i*self.glyph_width, 0, (i+1)*self.glyph_width, 0+self.glyph_height))
+            a.paste(glyph, (i * self.glyph_width, 0, (i + 1) * self.glyph_width, 0 + self.glyph_height))
         return a.im

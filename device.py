@@ -25,35 +25,35 @@
 
 # Example usage:
 #
-#   from oled.device import ssd1306, sh1106
+#   from oled.Device import ssd1306, sh1106
 #   from oled.render import canvas
 #   from PIL import ImageFont, ImageDraw
 #
 #   font = ImageFont.load_default()
-#   device = ssd1306(port=1, address=0x3C)
+#   Device = ssd1306(port=1, address=0x3C)
 #
-#   with canvas(device) as draw:
-#      draw.rectangle((0, 0, device.width, device.height), outline=0, fill=0)
+#   with canvas(Device) as draw:
+#      draw.rectangle((0, 0, Device.width, Device.height), outline=0, fill=0)
 #      draw.text(30, 40, "Hello World", font=font, fill=255)
 #
 # As soon as the with-block scope level is complete, the graphics primitives
-# will be flushed to the device.
+# will be flushed to the Device.
 #
 # Creating a new canvas is effectively 'carte blanche': If you want to retain
 # an existing canvas, then make a reference like:
 #
-#    c = canvas(device)
+#    c = canvas(Device)
 #    for X in ...:
 #        with c as draw:
 #            draw.rectangle(...)
 #
 # As before, as soon as the with block completes, the canvas buffer is flushed
-# to the device
+# to the Device
 
 import smbus
 
 
-class device(object):
+class Device(object):
     """
     Base class for OLED driver classes
     """
@@ -67,26 +67,26 @@ class device(object):
     def command(self, *cmd):
         """
         Sends a command or sequence of commands through to the
-        device - maximum allowed is 32 bytes in one go.
+        Device - maximum allowed is 32 bytes in one go.
         """
-        assert(len(cmd) <= 32)
+        assert (len(cmd) <= 32)
         self.bus.write_i2c_block_data(self.addr, self.cmd_mode, list(cmd))
 
     def data(self, data):
         """
         Sends a data byte or sequence of data bytes through to the
-        device - maximum allowed in one transaction is 32 bytes, so if
+        Device - maximum allowed in one transaction is 32 bytes, so if
         data is larger than this it is sent in chunks.
         """
         for i in range(0, len(data), 32):
             self.bus.write_i2c_block_data(self.addr,
                                           self.data_mode,
-                                          list(data[i:i+32]))
+                                          list(data[i:i + 32]))
 
 
-class sh1106(device):
+class sh1106(Device):
     """
-    A device encapsulates the I2C connection (address/port) to the SH1106
+    A Device encapsulates the I2C connection (address/port) to the SH1106
     OLED display hardware. The init method pumps commands to the display
     to properly initialize it. Further control commands can then be
     called to affect the brightness. Direct use of the command() and
@@ -102,28 +102,28 @@ class sh1106(device):
         self.command(
             const.DISPLAYOFF,
             const.MEMORYMODE,
-            const.SETHIGHCOLUMN,      0xB0, 0xC8,
-            const.SETLOWCOLUMN,       0x10, 0x40,
-            const.SETCONTRAST,        0x7F,
+            const.SETHIGHCOLUMN, 0xB0, 0xC8,
+            const.SETLOWCOLUMN, 0x10, 0x40,
+            const.SETCONTRAST, 0x7F,
             const.SETSEGMENTREMAP,
             const.NORMALDISPLAY,
-            const.SETMULTIPLEX,       0x3F,
+            const.SETMULTIPLEX, 0x3F,
             const.DISPLAYALLON_RESUME,
-            const.SETDISPLAYOFFSET,   0x00,
+            const.SETDISPLAYOFFSET, 0x00,
             const.SETDISPLAYCLOCKDIV, 0xF0,
-            const.SETPRECHARGE,       0x22,
-            const.SETCOMPINS,         0x12,
-            const.SETVCOMDETECT,      0x20,
-            const.CHARGEPUMP,         0x14,
+            const.SETPRECHARGE, 0x22,
+            const.SETCOMPINS, 0x12,
+            const.SETVCOMDETECT, 0x20,
+            const.CHARGEPUMP, 0x14,
             const.DISPLAYON)
 
     def display(self, image):
         """
         Takes a 1-bit image and dumps it to the SH1106 OLED display.
         """
-        assert(image.mode == '1')
-        assert(image.size[0] == self.width)
-        assert(image.size[1] == self.height)
+        assert (image.mode == '1')
+        assert (image.size[0] == self.width)
+        assert (image.size[1] == self.height)
 
         page = 0xB0
         pix = list(image.getdata())
@@ -146,14 +146,15 @@ class sh1106(device):
             self.data(buf)
 
 
-class ssd1306(device):
+class ssd1306(Device):
     """
-    A device encapsulates the I2C connection (address/port) to the SSD1306
+    A Device encapsulates the I2C connection (address/port) to the SSD1306
     OLED display hardware. The init method pumps commands to the display
     to properly initialize it. Further control commands can then be
     called to affect the brightness. Direct use of the command() and
     data() methods are discouraged.
     """
+
     def __init__(self, port=1, address=0x3C, width=128, height=64):
         super(ssd1306, self).__init__(port, address)
         self.width = width
@@ -163,25 +164,25 @@ class ssd1306(device):
         self.command(
             const.DISPLAYOFF,
             const.SETDISPLAYCLOCKDIV, 0x80,
-            const.SETMULTIPLEX,       0x3F,
-            const.SETDISPLAYOFFSET,   0x00,
+            const.SETMULTIPLEX, 0x3F,
+            const.SETDISPLAYOFFSET, 0x00,
             const.SETSTARTLINE,
-            const.CHARGEPUMP,         0x14,
-            const.MEMORYMODE,         0x00,
+            const.CHARGEPUMP, 0x14,
+            const.MEMORYMODE, 0x00,
             const.SEGREMAP,
             const.COMSCANDEC,
-            const.SETCOMPINS,         0x12,
-            const.SETCONTRAST,        0xCF,
-            const.SETPRECHARGE,       0xF1,
-            const.SETVCOMDETECT,      0x40,
+            const.SETCOMPINS, 0x12,
+            const.SETCONTRAST, 0xCF,
+            const.SETPRECHARGE, 0xF1,
+            const.SETVCOMDETECT, 0x40,
             const.DISPLAYALLON_RESUME,
             const.NORMALDISPLAY,
             const.DISPLAYON)
 
     def setpos(self, line, column):
         self.command(
-            const.PAGEADDR, line, line+1,  # Column start/end address
-            const.COLUMNADDR, column, column+1)
+            const.PAGEADDR, line, line + 1,  # Column start/end address
+            const.COLUMNADDR, column, column + 1)
 
     def write_byte(self, page, column, byte):
         self.setpos(page, column)
@@ -191,19 +192,19 @@ class ssd1306(device):
         """
         Takes a 1-bit image and dumps it to the SSD1306 OLED display.
         """
-        assert(image.mode == '1')
-        assert(image.size[0] == self.width)
-        assert(image.size[1] == self.height)
+        assert (image.mode == '1')
+        assert (image.size[0] == self.width)
+        assert (image.size[1] == self.height)
 
         self.command(
-            const.COLUMNADDR, 0x00, self.width-1,  # Column start/end address
-            const.PAGEADDR,   0x00, self.pages-1)  # Page start/end address
+            const.COLUMNADDR, 0x00, self.width - 1,  # Column start/end address
+            const.PAGEADDR, 0x00, self.pages - 1)  # Page start/end address
 
         pix = list(image.getdata())
         step = self.width * 8
         buf = []
         for y in range(0, self.pages * step, step):
-            i = y + self.width-1
+            i = y + self.width - 1
             while i >= y:
                 byte = 0
                 for n in range(0, step, self.width):
