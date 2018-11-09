@@ -14,10 +14,10 @@
 		<script type="text/javascript">
 			const img = document.querySelector('#img');
 			const update = () => {
-				d = new Date().getTime()
-				img.setAttribute('src', '1.png#'+d)
+				const d = new Date().getTime();
+				img.setAttribute('src', '1.png#'+d);
 				setTimeout(update, 300)
-			}
+			};
 			setTimeout(update, 0)
 
 		</script>
