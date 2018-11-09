@@ -51,7 +51,7 @@
     # to the device
 
 from PIL import Image, ImageDraw
-from time import time
+from time import time, sleep
 
 def timeit(fn):
     def inner(*args, **kwargs):
@@ -65,14 +65,20 @@ class DummyCanvas:
     def __init__(self, size):
         self.size = size
         self.image = Image.new('1', self.size)
+        self.black = Image.new('RGB', self.size)
+        self.display = Image.open('./assets/display.bmp').convert('RGB')
     
     def __enter__(self):
         return self.image
 
     def __exit__(self, type, value, traceback):
         if type is None:
-            # do the drawing onto the device
-            self.image.save('1.bmp')
+            try:
+                Image.composite(self.display, self.black, self.image).save('1.png')
+                sleep(0.05)
+            except Exception as e:
+                raise print(e)
+            
 
         self.image = Image.new('1', self.size)   # Tidy up the resources
         return False    # Never suppress exceptions

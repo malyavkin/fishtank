@@ -18,7 +18,7 @@ class UI:
         self.console_mgr = console_mgr
         while self.RUNNING:
             self.draw()
-            await asyncio.sleep(1)
+            await asyncio.sleep(0)
         return
 
 

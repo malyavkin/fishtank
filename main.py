@@ -13,12 +13,16 @@ try:
 except Exception:
     draw_target = DummyCanvas((128, 64))
 
+def handler(loop, context):
+	print(context)
 
 fnt = MyFont('./assets/1bit.png', './assets/1bit.descriptor.json')
 ui_mgr = UI(draw_target)
 ui_mgr.push_view(TitleView(fnt=fnt, UI=ui_mgr, title='Привет, мир!'))
 console_mgr = console()
 loop = asyncio.get_event_loop()
+loop.set_exception_handler(handler)
+loop.set_debug(True)
 loop.run_until_complete(asyncio.wait([
     ui_mgr.run(console_mgr),
     console_mgr.run(ui_mgr)
